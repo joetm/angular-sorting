@@ -1,0 +1,91 @@
+<html ng-app="HotelSorting">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta charset="utf-8"/>
+
+<title>Hotel Search and Sorting</title>
+
+<!-- Bootstrap : responsive utilities ONLY -->
+<link href="./css/bootstrap.min-responsiveonly.css" rel="stylesheet">
+
+<style type="text/css">
+body{text-align:center;}
+#output_table th{padding:10px;}
+#output_table td{font-size:0.9em;background-color:#FFEEEE;}
+@media (min-width: 768px) {
+	.ul{text-decoration:underline;cursor:pointer;}
+}
+</style>
+
+<script src="./js/angular.min.js" type="text/javascript"></script>
+
+<script type="text/javascript"><!--
+
+var HotelSorting = angular.module('HotelSorting', []);
+
+HotelSorting.controller('HCtrl', ['$scope', '$http', function ($scope, $http) {
+
+	$scope.hotels = [];
+
+	//get the hotels
+	$http.get('./hotels.json').
+		success(function(data, status, headers, config) {
+			//console.log(data);
+			$scope.hotels = data.Establishments;
+		}).
+		error(function(data, status, headers, config) {
+			console.error('Could not get hotels');
+		});
+
+}]);
+//-->
+</script>
+
+</head>
+<body>
+
+<h1>Hotel Sorting</h1>
+
+	<div align="center" style="margin-bottom:10px;clear:both;">
+
+		Search: <input ng-model="query">
+
+		Sort by:
+		<select ng-model="orderProp" ng-init="orderProp = 'MinCost'">
+			<option value="MinCost" selected="selected">Cost</option>
+			<option value="-UserRating">Ratings</option>
+			<option value="-UserRatingCount">Rating Count</option>
+			<option value="Location">Location</option>
+			<option value="country">Country</option>
+			<option value="Name">Alphabetical</option>
+		</select>
+
+	</div>
+
+
+	<table id="output_table" border="1" align="center" style="" width="80%">
+	<thead>
+	<tr>
+		<th colspan="2">Hotel</th>
+		<th>Location</th>
+		<th width="5%">Cost</th>
+		<th width="5%">Rating</th>
+		<th width="5%"># Ratings</th>
+	</tr>
+	</thead>
+	<tbody ng-controller="HCtrl">
+
+		<tr ng-repeat="hotel in hotels | filter:query | orderBy:orderProp">
+			  <td><img ng-src="{{hotel.ThumbnailUrl}}" alt="" /></td>
+			  <td>{{hotel.Name}}</td>
+			  <td>{{hotel.Location}}</td>
+			  <td>{{hotel.MinCost}}</td>
+			  <td>{{hotel.UserRating}}</td>
+			  <td>{{hotel.UserRatingCount}}</td>
+		</tr>
+
+	</tbody>
+	</table>
+
+</body>
+</html>
